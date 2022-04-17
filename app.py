@@ -39,6 +39,29 @@ def users():
         else:
             return {"error": "The request payload is not in JSON format"}
 
+@app.route('/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
+def handle_user(user_id):
+    user = Users.query.get_or_404(user_id)
+
+    if request.method == 'GET':
+        response = {
+            "name": user.name,
+            "address": user.address
+        }
+        return {"message": "success", "user": response}
+
+    elif request.method == 'PUT':
+        data = request.get_json()
+        user.name = data['name']
+        user.address = data['address']
+        db.session.add(user)
+        db.session.commit()
+        return {"message": f"user {user.name} successfully updated."}
+
+    elif request.method == 'DELETE':
+        db.session.delete(user)
+        db.session.commit()
+        return {"message": f"user {user.name} successfully deleted."}
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
