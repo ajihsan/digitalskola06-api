@@ -25,7 +25,7 @@ def users():
         result = [
             {
                 "name": user.name,
-                "model": user.address
+                "address": user.address
             } for user in users]
         return jsonify(result)
     
