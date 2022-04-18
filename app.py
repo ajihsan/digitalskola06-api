@@ -1,11 +1,25 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 app = Flask(__name__)
 DB_URI = "postgresql+psycopg2://digitalskola:D6GhCbaaiq8LlNy7@35.193.53.27:5432/api"
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 db = SQLAlchemy(app)
+auth = HTTPBasicAuth()
+
+users = {
+    "agus": generate_password_hash("hello"),
+    "bambang": generate_password_hash("bye")
+}
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and \
+            check_password_hash(users.get(username), password):
+        return username
 
 class Users(db.Model):
   __table_args__ = {"schema": "aji"}
@@ -17,7 +31,7 @@ class Users(db.Model):
     self.name = name
     self.address = address
 
-
+@auth.login_required
 @app.route("/users", methods=["GET", "POST"])
 def users():
     if request.authorization is None:
