@@ -20,6 +20,10 @@ class Users(db.Model):
 
 @app.route("/users", methods=["GET", "POST"])
 def users():
+    if request.authorization is None:
+        return {"message": f"Not Authorized."}
+    else:
+        pass
     if request.method == 'GET':
         users = Users.query.all()
         result = [
